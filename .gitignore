@@ -1,10 +1,33 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+### Java ###
+*.class
+*.log
+*.war
+*.ear
 
-### STS ###
+# Maven build
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Maven local repository (nếu bạn không dùng repo global)
+.mvn/repository/
+
+# Gradle build (nếu lỡ dùng song song)
+.gradle/
+build/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# IntelliJ Cache
+out/
+
+### VS Code ###
+.vscode/
+
+### Spring Tool Suite ###
 .apt_generated
 .classpath
 .factorypath
@@ -13,21 +36,34 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
 ### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
 
-### VS Code ###
-.vscode/
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Logs ###
+*.log
+logs/
+*.tmp
+
+### Docker ###
+*.pid
+docker-compose.override.yml
+.env
+.env.*
+.dockerignore
+
+### Jenkins ###
+/jenkins-home/
+/jenkins.log
+
+### Misc ###
+/*.swp
+*.bak
+*.tmp
