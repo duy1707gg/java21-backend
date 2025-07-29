@@ -1,0 +1,37 @@
+<!-- templates/login.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Đăng nhập</title>
+</head>
+<meta charset="UTF-8">
+
+<body>
+<h2>Đăng nhập</h2>
+<input type="text" id="username" placeholder="Tên đăng nhập">
+<input type="password" id="password" placeholder="Mật khẩu">
+<button onclick="login()">Đăng nhập</button>
+<p id="message" style="color:red;"></p>
+
+<script>
+    async function login() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            localStorage.setItem("token", data.token);
+            window.location.href = "/chamcong"; // chuyển tới trang chấm công
+        } else {
+            document.getElementById("message").innerText = "Sai tên đăng nhập hoặc mật khẩu";
+        }
+    }
+</script>
+</body>
+</html>

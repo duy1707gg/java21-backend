@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
     @GetMapping({"/", "/index"})
     public String index() {
-        return "index"; // Trả về "index.html" trong thư mục templates
+        return "index"; // trỏ tới index.html trong templates
     }
 }
