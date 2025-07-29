@@ -1,10 +1,12 @@
 package com.example.chamcong.controller;
 
 import com.example.chamcong.entity.ChamCong;
+import com.example.chamcong.entity.CongViec;
 import com.example.chamcong.entity.NhanVien;
 import com.example.chamcong.entity.User;
 import com.example.chamcong.security.CustomUserDetails;
 import com.example.chamcong.service.ChamCongService;
+import com.example.chamcong.service.CongViecService;
 import com.example.chamcong.service.NhanVienService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(" ")
+@RequestMapping("/api/chamcong")
 public class ChamCongController {
 
     @Autowired
@@ -23,6 +25,9 @@ public class ChamCongController {
 
     @Autowired
     private NhanVienService nhanVienService;
+
+    @Autowired
+    private CongViecService congViecService;
 
     @GetMapping
     public List<ChamCong> getAllChamCong() {
@@ -38,6 +43,37 @@ public class ChamCongController {
         return ResponseEntity.ok(cc);
     }
 
+    @PostMapping("/nhanvien/{nhanVienId}")
+    public ResponseEntity<?> createChamCongForNhanVien(
+            @PathVariable Long nhanVienId,
+            @RequestBody ChamCong chamCong) {
+        try {
+            NhanVien nhanVien = nhanVienService.findById(nhanVienId);
+            if (nhanVien == null) {
+                return ResponseEntity.badRequest().body("Không tìm thấy nhân viên với ID: " + nhanVienId);
+            }
+
+            // Kiểm tra công việc
+            if (chamCong.getCongViec() == null || chamCong.getCongViec().getId() == null) {
+                return ResponseEntity.badRequest().body("Thiếu thông tin công việc.");
+            }
+
+            CongViec congViec = congViecService.findById(chamCong.getCongViec().getId());
+            if (congViec == null) {
+                return ResponseEntity.badRequest().body("Công việc không tồn tại.");
+            }
+
+            chamCong.setCongViec(congViec);
+            chamCong.setNhanVien(nhanVien);
+
+            ChamCong saved = chamCongService.save(chamCong);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi tạo chấm công: " + e.getMessage());
+        }
+    }
+
+
     @PostMapping("/ca-nhan")
     public ResponseEntity<?> createChamCongCaNhan(@RequestBody ChamCong chamCong, Authentication authentication) {
         try {
@@ -49,7 +85,19 @@ public class ChamCongController {
                 return ResponseEntity.badRequest().body("Không tìm thấy nhân viên tương ứng với user");
             }
 
+            // Kiểm tra công việc
+            if (chamCong.getCongViec() == null || chamCong.getCongViec().getId() == null) {
+                return ResponseEntity.badRequest().body("Thiếu thông tin công việc.");
+            }
+
+            CongViec congViec = congViecService.findById(chamCong.getCongViec().getId());
+            if (congViec == null) {
+                return ResponseEntity.badRequest().body("Công việc không tồn tại.");
+            }
+
+            chamCong.setCongViec(congViec);
             chamCong.setNhanVien(nhanVien);
+
             ChamCong saved = chamCongService.save(chamCong);
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
@@ -63,6 +111,15 @@ public class ChamCongController {
         if (existing == null) {
             return ResponseEntity.notFound().build();
         }
+
+        // Nếu cập nhật công việc
+        if (chamCong.getCongViec() != null && chamCong.getCongViec().getId() != null) {
+            CongViec congViec = congViecService.findById(chamCong.getCongViec().getId());
+            if (congViec != null) {
+                chamCong.setCongViec(congViec);
+            }
+        }
+
         chamCong.setId(id);
         ChamCong updated = chamCongService.save(chamCong);
         return ResponseEntity.ok(updated);
@@ -83,19 +140,12 @@ public class ChamCongController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
 
-        System.out.println("🔐 Username từ token: " + username);
-
         NhanVien nv = nhanVienService.findByUserUsername(username);
-        System.out.println("🔍 NhanVien tìm được: " + nv);
-
         if (nv == null) {
-            System.out.println("❌ Không tìm thấy nhân viên!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         List<ChamCong> list = chamCongService.findByNhanVienId(nv.getId());
-        System.out.println("📊 Số bản ghi chấm công tìm được: " + list.size());
-
         return ResponseEntity.ok(list);
     }
 

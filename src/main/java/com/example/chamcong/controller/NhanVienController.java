@@ -119,6 +119,16 @@ public class NhanVienController {
         return ResponseEntity.ok("✅ Đã gán nhân viên ID " + id + " cho tài khoản " + username);
     }
 
+    // Lấy nhân viên theo userId
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<NhanVien> getNhanVienByUserId(@PathVariable Long userId) {
+        NhanVien nv = nhanVienService.findByUserId(userId);
+        if (nv == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(nv);
+    }
+
 
 }
 
