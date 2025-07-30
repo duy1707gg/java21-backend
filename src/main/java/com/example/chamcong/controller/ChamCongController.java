@@ -53,26 +53,32 @@ public class ChamCongController {
                 return ResponseEntity.badRequest().body("Không tìm thấy nhân viên với ID: " + nhanVienId);
             }
 
-            // Kiểm tra công việc
-            if (chamCong.getCongViec() == null || chamCong.getCongViec().getId() == null) {
-                return ResponseEntity.badRequest().body("Thiếu thông tin công việc.");
+            // Nếu trạng thái là "DI_LAM" thì cần công việc
+            if ("DI_LAM".equalsIgnoreCase(chamCong.getTrangThai())) {
+                if (chamCong.getCongViec() == null || chamCong.getCongViec().getId() == null) {
+                    return ResponseEntity.badRequest().body("Thiếu thông tin công việc khi đi làm.");
+                }
+
+                CongViec congViec = congViecService.findById(chamCong.getCongViec().getId());
+                if (congViec == null) {
+                    return ResponseEntity.badRequest().body("Công việc không tồn tại.");
+                }
+
+                chamCong.setCongViec(congViec);
+            } else {
+                chamCong.setCongViec(null); // nghỉ phép thì không cần công việc
             }
 
-            CongViec congViec = congViecService.findById(chamCong.getCongViec().getId());
-            if (congViec == null) {
-                return ResponseEntity.badRequest().body("Công việc không tồn tại.");
-            }
-
-            chamCong.setCongViec(congViec);
             chamCong.setNhanVien(nhanVien);
 
             ChamCong saved = chamCongService.save(chamCong);
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi tạo chấm công: " + e.getMessage());
+            e.printStackTrace(); // Ghi log chi tiết
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi tạo chấm công: " + e.getMessage());
         }
     }
-
 
     @PostMapping("/ca-nhan")
     public ResponseEntity<?> createChamCongCaNhan(@RequestBody ChamCong chamCong, Authentication authentication) {
@@ -85,25 +91,38 @@ public class ChamCongController {
                 return ResponseEntity.badRequest().body("Không tìm thấy nhân viên tương ứng với user");
             }
 
-            // Kiểm tra công việc
-            if (chamCong.getCongViec() == null || chamCong.getCongViec().getId() == null) {
-                return ResponseEntity.badRequest().body("Thiếu thông tin công việc.");
+            if ("DI_LAM".equalsIgnoreCase(chamCong.getTrangThai())) {
+                if (chamCong.getCongViec() == null || chamCong.getCongViec().getId() == null) {
+                    return ResponseEntity.badRequest().body("Thiếu thông tin công việc khi đi làm.");
+                }
+
+                CongViec congViec = congViecService.findById(chamCong.getCongViec().getId());
+                if (congViec == null) {
+                    return ResponseEntity.badRequest().body("Công việc không tồn tại.");
+                }
+
+                chamCong.setCongViec(congViec);
+            } else {
+                chamCong.setCongViec(null);
             }
 
-            CongViec congViec = congViecService.findById(chamCong.getCongViec().getId());
-            if (congViec == null) {
-                return ResponseEntity.badRequest().body("Công việc không tồn tại.");
-            }
-
-            chamCong.setCongViec(congViec);
             chamCong.setNhanVien(nhanVien);
 
             ChamCong saved = chamCongService.save(chamCong);
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi khi tạo chấm công: " + e.getMessage());
+            e.printStackTrace(); // Ghi log rõ ràng
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi tạo chấm công: " + e.getMessage());
         }
     }
+
+    @GetMapping("/tong-tien-cong/{userId}")
+    public ResponseEntity<Double> tongTienCong(@PathVariable Long userId) {
+        double tong = chamCongService.tinhTongTienCongTheoUserId(userId);
+        return ResponseEntity.ok(tong);
+    }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<ChamCong> updateChamCong(@PathVariable Long id, @RequestBody ChamCong chamCong) {
@@ -112,12 +131,17 @@ public class ChamCongController {
             return ResponseEntity.notFound().build();
         }
 
-        // Nếu cập nhật công việc
-        if (chamCong.getCongViec() != null && chamCong.getCongViec().getId() != null) {
-            CongViec congViec = congViecService.findById(chamCong.getCongViec().getId());
-            if (congViec != null) {
-                chamCong.setCongViec(congViec);
+        if ("DI_LAM".equalsIgnoreCase(chamCong.getTrangThai())) {
+            if (chamCong.getCongViec() != null && chamCong.getCongViec().getId() != null) {
+                CongViec congViec = congViecService.findById(chamCong.getCongViec().getId());
+                if (congViec != null) {
+                    chamCong.setCongViec(congViec);
+                }
+            } else {
+                return ResponseEntity.badRequest().body(null);
             }
+        } else {
+            chamCong.setCongViec(null);
         }
 
         chamCong.setId(id);

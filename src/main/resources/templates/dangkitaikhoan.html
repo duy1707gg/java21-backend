@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Đăng ký tài khoản</title>
+
+    <!-- Bootstrap CSS + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .register {
+            background-image: url('anh/imgtaotaikhoan.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .register__header {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .register__logo-img {
+            height: 100px;
+        }
+
+        .register__main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .register__card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            margin: 6rem auto 2rem;
+        }
+
+        .message {
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .footer__register {
+            background-color: aliceblue;
+            color: #333;
+            text-align: center;
+            padding: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+<div class="register">
+    <!-- Header -->
+    <header class="register__header d-flex justify-content-between align-items-center p-3">
+        <div class="d-flex align-items-center">
+            <img src="./anh/logo.png" alt="Logo" class="register__logo-img me-3">
+            <div>
+                <strong class="register__title">Hệ thống quản lý chấm công</strong>
+                <p class="register__welcome">Chào mừng bạn đến với hệ thống</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main đăng ký -->
+    <main class="register__main">
+        <div class="register__card">
+            <h3 class="text-center mb-4">Tạo tài khoản mới</h3>
+
+            <form id="registerForm">
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-person-circle"></i></span>
+                    <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" required />
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" class="form-control" id="password" placeholder="Mật khẩu" required />
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Đăng ký</button>
+                </div>
+
+                <div class="message" id="message"></div>
+
+                <div class="text-center mt-3">
+                    <a th:href="@{/}">Bạn đã có tài khoản?</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer__register">
+        &copy; 2025 Công ty TNHH ABC | Hệ thống chấm công nội bộ
+    </footer>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script xử lý đăng ký -->
+<script>
+    const form = document.getElementById("registerForm");
+    const messageDiv = document.getElementById("message");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const payload = {
+            username: document.getElementById("username").value.trim(),
+            password: document.getElementById("password").value.trim()
+        };
+
+        try {
+            const res = await fetch("/api/user/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                messageDiv.style.color = "green";
+                messageDiv.innerText = "🎉 Đăng ký thành công!";
+                form.reset();
+            } else {
+                const err = await res.json();
+                messageDiv.style.color = "red";
+                messageDiv.innerText = "Đăng ký thất bại: " + (err.message || "Lỗi không xác định");
+            }
+        } catch (error) {
+            messageDiv.style.color = "red";
+            messageDiv.innerText = "Không thể kết nối đến máy chủ!";
+        }
+    });
+</script>
+</body>
+</html>

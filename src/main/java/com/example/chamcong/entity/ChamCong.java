@@ -13,10 +13,12 @@ public class ChamCong {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cong_viec_id", nullable = false)
     private CongViec congViec;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "nhan_vien_id")
     private NhanVien nhanVien; // Có thể null nếu là cá nhân tự chấm công
 
     private LocalDate ngayCham;
@@ -24,6 +26,9 @@ public class ChamCong {
     private String trangThai; // DI_LAM, NGHI_CO_LY_DO, NGHI_KHONG_LY_DO
 
     private String ghiChu;
+
+    @Column(name = "tien_cong")
+    private Double tienCong;
 
     public ChamCong() {}
 
@@ -50,4 +55,8 @@ public class ChamCong {
     public String getGhiChu() { return ghiChu; }
 
     public void setGhiChu(String ghiChu) { this.ghiChu = ghiChu; }
-}
+
+    public Double getTienCong() { return tienCong; }
+    public void setTienCong(Double tienCong) { this.tienCong = tienCong;}
+
+    }

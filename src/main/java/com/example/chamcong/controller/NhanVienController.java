@@ -3,6 +3,7 @@ package com.example.chamcong.controller;
 import com.example.chamcong.entity.NhanVien;
 import com.example.chamcong.service.NhanVienService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -100,7 +101,11 @@ public class NhanVienController {
     }
     @PutMapping("/{id}/link")
     public ResponseEntity<?> linkNhanVienToCurrentUser(@PathVariable Long id, Authentication authentication) {
-        String username = authentication.getName();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("❌ Chưa đăng nhập hoặc phiên đăng nhập không hợp lệ.");
+        }
+
+        String username = authentication.getName(); // sẽ không lỗi nữa
 
         NhanVien nv = nhanVienService.findById(id);
         if (nv == null) {
@@ -118,6 +123,7 @@ public class NhanVienController {
 
         return ResponseEntity.ok("✅ Đã gán nhân viên ID " + id + " cho tài khoản " + username);
     }
+
 
     // Lấy nhân viên theo userId
     @GetMapping("/user/{userId}")

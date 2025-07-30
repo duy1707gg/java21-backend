@@ -50,7 +50,7 @@ public class NhanVienService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng: " + username));
         nhanVien.setUser(user);
-        nhanVienRepository.save(nhanVien); // <- thêm dòng này để lưu liên kết
-        return false;
+        nhanVienRepository.save(nhanVien);
+        return true; // ✅ trả về true khi thành công
     }
 }

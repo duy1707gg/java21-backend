@@ -31,4 +31,11 @@ public class ChamCongService {
     public void deleteById(Long id) {
         chamCongRepository.deleteById(id);
     }
+
+    public double tinhTongTienCongTheoUserId(Long userId) {
+        List<ChamCong> chamCongs = chamCongRepository.findByNhanVienUserId(userId);
+        return chamCongs.stream()
+                .mapToDouble(c -> c.getCongViec().getTienCongMotDonVi())
+                .sum();
+    }
 }

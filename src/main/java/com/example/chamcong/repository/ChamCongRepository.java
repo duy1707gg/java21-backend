@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ChamCongRepository extends JpaRepository<ChamCong, Long> {
     List<ChamCong> findByNhanVienId(Long nhanVienId);
+    List<ChamCong> findByNhanVienUserId(Long userId);
 }
