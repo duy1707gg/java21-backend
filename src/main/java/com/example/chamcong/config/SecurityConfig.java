@@ -63,7 +63,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/user/profile").authenticated()
                         .requestMatchers("/api/nhanvien/me").authenticated()
-                        .requestMatchers("/api/chamcong/**").authenticated()
+                        .requestMatchers("/api/chamcong/**").permitAll()
+                        .requestMatchers("/api/congviec/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session
