@@ -8,10 +8,11 @@
 <body class="bg-light">
 <div class="home d-flex flex-column min-vh-100">
     <!-- HEADER -->
-    <header class="home__header d-flex justify-content-between align-items-center px-3 py-2 border-bottom shadow-sm" style="font-size: 0.95rem;">
+    <header class="home__header d-flex justify-content-between align-items-center px-3 py-2 border-bottom shadow-sm"
+            style="font-size: 0.95rem;">
         <div class="d-flex align-items-center">
             <a th:href="@{/index}" class="d-flex align-items-center text-decoration-none text-dark">
-                <img src="./anh/logo.png" alt="Logo" class="me-2" style="width: 40px; height: 40px;" />
+                <img src="./anh/logo.png" alt="Logo" class="me-2" style="width: 40px; height: 40px;"/>
                 <div>
                     <strong style="font-size: 1rem;">Quản lý chấm công</strong>
                     <p class="mb-0" style="font-size: 0.8rem;">Chào mừng bạn!</p>
@@ -23,68 +24,68 @@
         </a>
     </header>
 
-<div class="container mt-5">
-    <h2 class="mb-4 text-primary">Chấm công cho nhân viên</h2>
+    <div class="container mt-5">
+        <h2 class="mb-4 text-primary">Chấm công cho nhân viên</h2>
 
-    <div class="card mb-5">
-        <div class="card-body">
-            <form id="chamCongForm">
-                <div class="mb-3">
-                    <label for="nhanVienId" class="form-label">Nhân viên</label>
-                    <select id="nhanVienId" class="form-select" required>
-                        <option value="">-- Chọn nhân viên --</option>
-                    </select>
-                </div>
+        <div class="card mb-5">
+            <div class="card-body">
+                <form id="chamCongForm">
+                    <div class="mb-3">
+                        <label for="nhanVienId" class="form-label">Nhân viên</label>
+                        <select id="nhanVienId" class="form-select" required>
+                            <option value="">-- Chọn nhân viên --</option>
+                        </select>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="ngayCham" class="form-label">Ngày chấm</label>
-                    <input type="date" id="ngayCham" class="form-control" required>
-                </div>
+                    <div class="mb-3">
+                        <label for="ngayCham" class="form-label">Ngày chấm</label>
+                        <input type="date" id="ngayCham" class="form-control" required>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="trangThai" class="form-label">Trạng thái</label>
-                    <select id="trangThai" class="form-select" required>
-                        <option value="DI_LAM">Đi làm</option>
-                        <option value="NGHI_CO_PHEP">Nghỉ có phép</option>
-                        <option value="NGHI_KHONG_PHEP">Nghỉ không phép</option>
-                    </select>
-                </div>
+                    <div class="mb-3">
+                        <label for="trangThai" class="form-label">Trạng thái</label>
+                        <select id="trangThai" class="form-select" required>
+                            <option value="DI_LAM">Đi làm</option>
+                            <option value="NGHI_CO_PHEP">Nghỉ có phép</option>
+                            <option value="NGHI_KHONG_PHEP">Nghỉ không phép</option>
+                        </select>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="congViecId" class="form-label">Công việc</label>
-                    <select id="congViecId" class="form-select">
-                        <option value="">-- Chọn công việc --</option>
-                    </select>
-                </div>
+                    <div class="mb-3">
+                        <label for="congViecId" class="form-label">Công việc</label>
+                        <select id="congViecId" class="form-select">
+                            <option value="">-- Chọn công việc --</option>
+                        </select>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="ghiChu" class="form-label">Ghi chú</label>
-                    <input type="text" id="ghiChu" class="form-control">
-                </div>
+                    <div class="mb-3">
+                        <label for="ghiChu" class="form-label">Ghi chú</label>
+                        <input type="text" id="ghiChu" class="form-control">
+                    </div>
 
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-success">Lưu</button>
-                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Hủy</button>
-                </div>
-            </form>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-success">Lưu</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">Hủy</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <h4 class="mb-3 text-secondary">Lịch sử chấm công</h4>
-    <table class="table table-bordered table-striped" id="chamCongTable">
-        <thead class="table-dark">
-        <tr>
-            <th>Nhân viên</th>
-            <th>Ngày</th>
-            <th>Trạng thái</th>
-            <th>Công việc</th>
-            <th>Ghi chú</th>
-            <th>Hành động</th>
-        </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
+        <h4 class="mb-3 text-secondary">Lịch sử chấm công</h4>
+        <table class="table table-bordered table-striped" id="chamCongTable">
+            <thead class="table-dark">
+            <tr>
+                <th>Nhân viên</th>
+                <th>Ngày</th>
+                <th>Trạng thái</th>
+                <th>Công việc</th>
+                <th>Ghi chú</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>
 <script>
     const token = localStorage.getItem("token");
@@ -133,7 +134,12 @@
         const congViecId = document.getElementById("congViecId").value;
         const ghiChu = document.getElementById("ghiChu").value;
 
-        const body = { ngayCham, trangThai, ghiChu };
+        const body = {
+            ngayCham,
+            trangThai,
+            ghiChu,
+            nhanVien: { id: parseInt(nhanVienId) }
+           };
 
         if (trangThai === "DI_LAM") {
             if (!congViecId) {

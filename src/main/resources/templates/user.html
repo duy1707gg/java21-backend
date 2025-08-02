@@ -3,112 +3,107 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Quản lý Người dùng</title>
+    <title>Hồ sơ người dùng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 </head>
-<!-- ... phần <head> giữ nguyên ... -->
 <body>
-<div class="home d-flex flex-column min-vh-100">
-    <!-- HEADER -->
-    <header class="home__header d-flex justify-content-between align-items-center px-3 py-2 border-bottom shadow-sm" style="font-size: 0.95rem;">
-        <div class="d-flex align-items-center">
-            <a href="/index" class="d-flex align-items-center text-decoration-none text-dark">
-                <img src="./anh/logo.png" alt="Logo" class="me-2" style="width: 40px; height: 40px;" />
-                <div>
-                    <strong style="font-size: 1rem;">Quản lý chấm công</strong>
-                    <p class="mb-0" style="font-size: 0.8rem;">Chào mừng bạn!</p>
-                </div>
-            </a>
-        </div>
-        <a href="#" id="logoutBtn" class="text-danger text-decoration-none d-flex align-items-center" style="font-size: 0.9rem;">
-            <i class="bi bi-box-arrow-right me-1"></i> <span>Đăng xuất</span>
+<!-- ✅ HEADER mới -->
+<header class="home__header d-flex justify-content-between align-items-center px-3 py-2 border-bottom shadow-sm" style="font-size: 0.95rem;">
+    <div class="d-flex align-items-center">
+        <a th:href="@{/index}" href="/index" class="d-flex align-items-center text-decoration-none text-dark">
+            <img src="./anh/logo.png" alt="Logo" class="me-2" style="width: 40px; height: 40px;" />
+            <div>
+                <strong style="font-size: 1rem;">Quản lý chấm công</strong>
+                <p class="mb-0" style="font-size: 0.8rem;">Chào mừng bạn!</p>
+            </div>
         </a>
-    </header>
+    </div>
+</header>
+<div class="container py-4">
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">👤 Hồ sơ cá nhân</h2>
+        <button id="logoutBtn" class="btn btn-outline-danger btn-sm">🚪 Đăng xuất</button>
+    </div>
 
-    <div class="container mt-5">
-        <h2>Thông tin Người dùng hiện tại</h2>
-        <div id="currentUser" class="mb-4"></div>
+    <!-- Thông tin người dùng hiện tại -->
+    <div class="mb-4">
+        <div id="currentUser" class="p-3 bg-light border rounded"></div>
+    </div>
 
-        <h4>Tìm kiếm Người dùng theo Username</h4>
-        <form id="searchForm" class="mb-3 d-flex gap-2">
-            <input type="text" id="searchUsername" class="form-control" placeholder="Nhập username" required />
-            <button class="btn btn-primary" type="submit">Tìm</button>
+    <!-- Tìm kiếm người dùng -->
+    <form id="searchForm" class="d-flex gap-2 mb-4">
+        <input type="text" id="searchUsername" class="form-control" placeholder="🔍 Nhập username..." required />
+        <button class="btn btn-primary" type="submit">Tìm</button>
+    </form>
+
+    <!-- Hiển thị thông tin người dùng -->
+    <div id="userInfo" class="mb-4"></div>
+
+    <!-- Form cập nhật -->
+    <div id="updateFormContainer" class="d-none">
+        <form id="updateForm" class="bg-light border p-4 rounded">
+            <input type="hidden" id="userId" />
+
+            <div class="mb-3">
+                <label for="updateUsername" class="form-label">📛 Tên người dùng:</label>
+                <input type="text" id="updateUsername" class="form-control" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="updatePassword" class="form-label">🔒 Mật khẩu mới:</label>
+                <input type="password" id="updatePassword" class="form-control" required />
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-warning">💾 Cập nhật</button>
+                <button type="button" id="deleteBtn" class="btn btn-danger">🗑️ Xoá tài khoản</button>
+            </div>
         </form>
-
-        <div id="userInfo" class="mb-3"></div>
-
-        <div id="updateFormContainer" class="d-none">
-            <h4>Cập nhật thông tin Người dùng</h4>
-            <form id="updateForm">
-                <input type="hidden" id="userId" />
-                <div class="mb-2">
-                    <label for="updateUsername" class="form-label">Username:</label>
-                    <input type="text" class="form-control" id="updateUsername" required />
-                </div>
-                <div class="mb-2">
-                    <label for="updatePassword" class="form-label">Password:</label>
-                    <input type="password" class="form-control" id="updatePassword" required />
-                </div>
-                <div class="mb-2">
-                    <label for="updateRole" class="form-label">Role:</label>
-                    <input type="text" class="form-control" id="updateRole" required />
-                </div>
-                <button type="submit" class="btn btn-warning">Cập nhật</button>
-                <button type="button" class="btn btn-danger" id="deleteBtn">Xóa</button>
-            </form>
-        </div>
     </div>
 </div>
 
 <script>
     const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login';
 
-    // Nếu không có token → về login
-    if (!token) {
-        window.location.href = '/login';
-    }
-
-    // Nút đăng xuất
     document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem('token');
         window.location.href = '/';
     });
 
-    // Hiển thị user hiện tại
+    // Lấy thông tin người dùng hiện tại (không hiển thị role)
     fetch('/api/user/profile', {
         headers: { Authorization: `Bearer ${token}` }
     })
-        .then(res => {
-            if (!res.ok) throw new Error("Chưa đăng nhập");
-            return res.json();
-        })
+        .then(res => res.ok ? res.json() : Promise.reject("Không có quyền truy cập"))
         .then(user => {
             document.getElementById('currentUser').innerHTML =
-                `<strong>${user.username}</strong> (role: ${user.role || 'Không xác định'})`;
+                `<strong>${user.username}</strong>`;
         })
         .catch(err => {
             document.getElementById('currentUser').innerHTML = `<span class="text-danger">${err}</span>`;
         });
 
-    // Tìm user theo username
+    // Tìm kiếm người dùng (ẩn role)
     document.getElementById('searchForm').addEventListener('submit', e => {
         e.preventDefault();
         const username = document.getElementById('searchUsername').value;
+
         fetch(`/api/user/${username}`, {
             headers: { Authorization: `Bearer ${token}` }
         })
-            .then(res => res.ok ? res.json() : Promise.reject("Không tìm thấy user"))
+            .then(res => res.ok ? res.json() : Promise.reject("Không tìm thấy người dùng"))
             .then(user => {
                 document.getElementById('userInfo').innerHTML =
                     `<div><strong>ID:</strong> ${user.id}</div>
-                     <div><strong>Username:</strong> ${user.username}</div>
-                     <div><strong>Role:</strong> ${user.role}</div>`;
+                     <div><strong>Username:</strong> ${user.username}</div>`;
 
                 document.getElementById('updateFormContainer').classList.remove('d-none');
                 document.getElementById('userId').value = user.id;
                 document.getElementById('updateUsername').value = user.username;
-                document.getElementById('updatePassword').value = user.password;
-                document.getElementById('updateRole').value = user.role;
+                document.getElementById('updatePassword').value = '';
             })
             .catch(err => {
                 document.getElementById('userInfo').innerHTML = `<span class="text-danger">${err}</span>`;
@@ -122,8 +117,7 @@
         const id = document.getElementById('userId').value;
         const user = {
             username: document.getElementById('updateUsername').value,
-            password: document.getElementById('updatePassword').value,
-            role: document.getElementById('updateRole').value
+            password: document.getElementById('updatePassword').value
         };
 
         fetch(`/api/user/${id}`, {
@@ -134,30 +128,26 @@
             },
             body: JSON.stringify(user)
         })
-            .then(res => res.json())
-            .then(updated => {
-                alert('Cập nhật thành công!');
-            })
-            .catch(err => alert('Lỗi khi cập nhật!'));
+            .then(res => res.ok ? res.json() : Promise.reject("Cập nhật thất bại"))
+            .then(() => alert("✅ Cập nhật thành công"))
+            .catch(() => alert("❌ Lỗi khi cập nhật!"));
     });
 
-    // Xóa người dùng
+    // Xoá người dùng
     document.getElementById('deleteBtn').addEventListener('click', () => {
         const id = document.getElementById('userId').value;
-        if (!confirm("Bạn có chắc muốn xóa user này?")) return;
+        if (!confirm("Bạn có chắc chắn muốn xoá người dùng này?")) return;
 
         fetch(`/api/user/${id}`, {
             method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
+            headers: { Authorization: `Bearer ${token}` }
         })
             .then(res => {
                 if (res.ok) {
-                    alert("Xóa thành công");
+                    alert("🗑️ Xoá thành công");
                     location.reload();
                 } else {
-                    throw new Error("Không thể xóa");
+                    throw new Error("Không thể xoá người dùng");
                 }
             })
             .catch(err => alert(err));
