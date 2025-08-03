@@ -17,6 +17,10 @@ public class ChamCong {
     @JoinColumn(name = "cong_viec_id", nullable = false)
     private CongViec congViec;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "nhan_vien_id")
     private NhanVien nhanVien; // Có thể null nếu là cá nhân tự chấm công
@@ -59,4 +63,11 @@ public class ChamCong {
     public Double getTienCong() { return tienCong; }
     public void setTienCong(Double tienCong) { this.tienCong = tienCong;}
 
+    public void setUser(User user) {
+        this.user = user;
     }
+
+    public User getUser() {
+        return user;
+    }
+}

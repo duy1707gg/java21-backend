@@ -85,11 +85,7 @@ public class ChamCongController {
         try {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             User user = userDetails.getUser();
-            NhanVien nhanVien = nhanVienService.findByUserId(user.getId());
 
-            if (nhanVien == null) {
-                return ResponseEntity.badRequest().body("Không tìm thấy nhân viên tương ứng với user");
-            }
 
             if ("DI_LAM".equalsIgnoreCase(chamCong.getTrangThai())) {
                 if (chamCong.getCongViec() == null || chamCong.getCongViec().getId() == null) {
@@ -106,7 +102,13 @@ public class ChamCongController {
                 chamCong.setCongViec(null);
             }
 
-            chamCong.setNhanVien(nhanVien);
+            // Nếu user chưa gán với nhân viên, vẫn cho phép chấm công cá nhân
+            NhanVien nhanVien = nhanVienService.findByUserId(user.getId());
+            if (nhanVien != null) {
+                chamCong.setNhanVien(nhanVien);
+            }
+
+            chamCong.setUser(user);
 
             ChamCong saved = chamCongService.save(chamCong);
             return ResponseEntity.ok(saved);
@@ -172,6 +174,77 @@ public class ChamCongController {
         List<ChamCong> list = chamCongService.findByNhanVienId(nv.getId());
         return ResponseEntity.ok(list);
     }
+
+    @GetMapping("/ca-nhan")
+    public ResponseEntity<?> getChamCongCaNhan(Authentication authentication) {
+        try {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long userId = userDetails.getUser().getId();
+
+            System.out.println("🔍 User ID từ token: " + userId);
+            List<ChamCong> list = chamCongService.findByUserId(userId);
+
+            System.out.println("📦 Số bản ghi tìm được: " + list.size());
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi lấy dữ liệu cá nhân");
+        }
+    }
+
+
+    @PutMapping("/ca-nhan/{id}")
+    public ResponseEntity<?> updateChamCongCaNhan(
+            @PathVariable Long id,
+            @RequestBody ChamCong chamCong,
+            Authentication authentication) {
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User currentUser = userDetails.getUser();
+
+        ChamCong existing = chamCongService.findById(id);
+        if (existing == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy bản ghi chấm công.");
+        }
+
+        // Đảm bảo chỉ cho phép người tạo (user) cập nhật bản ghi của mình
+        if (existing.getUser() == null || !existing.getUser().getId().equals(currentUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Bạn không có quyền sửa bản ghi này.");
+        }
+
+        try {
+            if ("DI_LAM".equalsIgnoreCase(chamCong.getTrangThai())) {
+                if (chamCong.getCongViec() == null || chamCong.getCongViec().getId() == null) {
+                    return ResponseEntity.badRequest().body("Thiếu thông tin công việc khi đi làm.");
+                }
+
+                CongViec congViec = congViecService.findById(chamCong.getCongViec().getId());
+                if (congViec == null) {
+                    return ResponseEntity.badRequest().body("Công việc không tồn tại.");
+                }
+
+                existing.setCongViec(congViec);
+            } else {
+                existing.setCongViec(null);
+            }
+
+            existing.setNgayCham(chamCong.getNgayCham());
+            existing.setTrangThai(chamCong.getTrangThai());
+            existing.setGhiChu(chamCong.getGhiChu());
+            existing.setTienCong(chamCong.getTienCong());
+
+            ChamCong updated = chamCongService.save(existing);
+            return ResponseEntity.ok(updated);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi cập nhật chấm công: " + e.getMessage());
+        }
+    }
+
+
+
 
     @GetMapping("/nhanvien/{id}")
     public ResponseEntity<List<ChamCong>> getChamCongByNhanVienId(@PathVariable Long id) {

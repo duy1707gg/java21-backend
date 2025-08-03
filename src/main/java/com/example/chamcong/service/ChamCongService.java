@@ -38,4 +38,9 @@ public class ChamCongService {
                 .mapToDouble(c -> c.getCongViec().getTienCongMotDonVi())
                 .sum();
     }
+    public List<ChamCong> findByUserId(Long userId) {
+        return chamCongRepository.findByUserId(userId);
+    }
+
+
 }
