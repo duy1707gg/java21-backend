@@ -53,17 +53,17 @@
               .menu-items {
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between;
-                height: 100%;
+                gap: 10px;
               }
               .menu a {
                 display: flex;
                 align-items: center;
-                padding: 0.5rem 1rem;
+                padding: 8px 12px;
                 color: #333;
                 text-decoration: none;
-                border-radius: 0.25rem;
-                margin-bottom: 0.25rem;
+                border-radius: 6px;
+                transition: background-color 0.2s ease;
+                font-size: 15px;
               }
               .menu a:hover {
                 background-color: #e9ecef;
@@ -153,7 +153,6 @@
                 <a href="javascript:void(0)" id="toggleSidebarBtn" class="btn btn-light mb-3">
                     <i class="bi bi-list"></i> <span>Menu</span>
                 </a>
-                <a href="#" data-target="homeContent"><i class="bi bi-house-door me-2"></i><span>Trang chủ</span></a>
                 <a th:href="@{/chamcong}" data-target="personalCheckinContent"><i class="bi bi-person-check me-2"></i><span>Chấm công cá nhân</span></a>
                 <a th:href="@{/chamcongnhanvien}" data-target="staffCheckinContent"><i class="bi bi-people-fill me-2"></i><span>Chấm công nhân viên</span></a>
                 <a th:href="@{/congviec}" data-target="historyContent"><i class="bi bi-clock-history me-2"></i><span>Công việc</span></a>
@@ -188,7 +187,14 @@
 
 <!-- JS logic -->
 <script>
-    // Toàn bộ logic script bạn viết ở phần cuối (toggle menu, render task, modal...)
+    document.addEventListener("DOMContentLoaded", function () {
+           const menu = document.getElementById("menubar");
+           const toggleBtn = document.getElementById("toggleSidebarBtn");
+
+           toggleBtn.addEventListener("click", function () {
+               menu.classList.toggle("collapsed");
+           });
+       });
 </script>
 </body>
 </html>
