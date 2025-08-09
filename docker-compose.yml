@@ -10,8 +10,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 'Duyhn1707!'
       MYSQL_DATABASE: chamcongdb
-    ports:
-      - "3306:3306"
+    expose:
+      - "3306"
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
