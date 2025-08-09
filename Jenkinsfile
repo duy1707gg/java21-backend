@@ -2,8 +2,11 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'java21-backend'
+        // Giữ lại để log/trace nếu cần, compose sẽ build từ Dockerfile tại repo root
+        IMAGE_NAME     = 'java21-backend'
         CONTAINER_NAME = 'java21-backend-container'
+        // Dùng docker-compose v1 (docker-compose). Nếu bạn dùng Docker Compose v2, đổi thành: 'docker compose'
+        COMPOSE_CMD    = 'docker-compose'
     }
 
     stages {
@@ -17,24 +20,21 @@ pipeline {
         stage('Build JAR') {
             steps {
                 echo '⚙️ Building Spring Boot JAR...'
-                bat './mvnw clean package -DskipTests'
+                // Maven Wrapper chạy trên Windows agent
+                bat '.\\mvnw clean package -DskipTests'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Deploy with Docker Compose') {
             steps {
-                echo '🐳 Building Docker image...'
-                bat "docker build -t %IMAGE_NAME%:latest ."
-            }
-        }
-
-        stage('Deploy Docker Container') {
-            steps {
-                echo '🚀 Deploying Docker container...'
+                echo '🐳 Building & deploying stack with docker-compose...'
+                // Tắt và dọn orphan containers nếu có (không fail nếu chưa tồn tại)
                 bat """
-                docker stop %CONTAINER_NAME% || exit 0
-                docker rm %CONTAINER_NAME% || exit 0
-                docker run -d --name %CONTAINER_NAME% -p 5000:5000 %IMAGE_NAME%:latest
+                %COMPOSE_CMD% down -v --remove-orphans || exit 0
+                """
+                // Build image từ Dockerfile + chạy cả MySQL và backend ở chế độ detached
+                bat """
+                %COMPOSE_CMD% up -d --build
                 """
             }
         }
@@ -46,6 +46,10 @@ pipeline {
         }
         failure {
             echo '❌ Deployment failed. Please check the logs.'
+        }
+        always {
+            echo '📜 Recent containers status:'
+            bat 'docker ps --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}"'
         }
     }
 }
