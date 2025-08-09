@@ -3,7 +3,6 @@ version: "3.8"
 services:
   db:
     image: mysql:8.0
-    container_name: mysql-db
     command:
       - --default-authentication-plugin=mysql_native_password
       - --character-set-server=utf8mb4
@@ -25,7 +24,6 @@ services:
   backend:
     build: .
     image: java21-backend:latest
-    container_name: java21-backend-container
     depends_on:
       db:
         condition: service_healthy
